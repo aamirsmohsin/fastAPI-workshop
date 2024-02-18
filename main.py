@@ -71,18 +71,22 @@ def get_deposits(student_id: int, db: Session = Depends(get_db)):
 # Exercise: Write a Post Request
 @app.post("/comments", response_model=schemas.Comment)
 def create_comments(comment: schemas.CommentCreate, db: Session = Depends(get_db)):
+    
     # 1] Parse the comment parameter
+    new_comment = models.Comment(**comment.model_dump())
 
     # 2] Add the comment
+    db.add(new_comment)
 
     # 3] Commit the comment
+    db.commit()
 
     # 4] Refresh the database
+    db.refresh(new_comment)
 
     # 5] Return a status message
+    return new_comment
     
-    return {"message": "successfully created"}
-
 ## Additional Notes
 
 # 1] Routers are a way to organize endpoints and group related operations together
