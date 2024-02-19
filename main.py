@@ -72,15 +72,15 @@ def get_deposits(student_id: int, db: Session = Depends(get_db)):
 @app.post("/comments", response_model=schemas.Comment)
 def create_comments(comment: schemas.CommentCreate, db: Session = Depends(get_db)):
     # 1] Parse the comment parameter
-
+    dbcomment = models.Comment(**comment.model_dump())
     # 2] Add the comment
-
+    db.add(dbcomment)
     # 3] Commit the comment
-
+    db.commit()
     # 4] Refresh the database
-
+    db.refresh(dbcomment)
     # 5] Return a status message
-    
+    return dbcomment
     return {"message": "successfully created"}
 
 ## Additional Notes
