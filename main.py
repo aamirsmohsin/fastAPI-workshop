@@ -8,6 +8,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import SQLAlchemyError
 
 # Config Imports
 from pydantic_settings import BaseSettings
@@ -72,16 +73,19 @@ def get_deposits(student_id: int, db: Session = Depends(get_db)):
 @app.post("/comments", response_model=schemas.Comment)
 def create_comments(comment: schemas.CommentCreate, db: Session = Depends(get_db)):
     # 1] Parse the comment parameter
+    parsed_comment = models.Comment(student_id=comment.student_id, message=comment.message)
 
     # 2] Add the comment
+    db.add(parsed_comment)
 
     # 3] Commit the comment
+    db.commit()
 
     # 4] Refresh the database
+    db.refresh(parsed_comment)
 
     # 5] Return a status message
-    
-    return {"message": "successfully created"}
+    return parsed_comment
 
 ## Additional Notes
 
